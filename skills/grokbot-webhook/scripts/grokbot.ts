@@ -37,7 +37,7 @@ function ensureDirs(): void {
 }
 
 function loadConfig(): Config {
-  if (!fs.existsSync(CONFIG)) fail(`还没配置，请用户在自己的终端运行：${RUN} setup`);
+  if (!fs.existsSync(CONFIG)) fail(`还没配置。首次配置步骤见 SKILL.md 或 https://github.com/Eriice/grokbot-webhook-skill#readme，其中 setup 需要用户在自己的终端运行：${RUN} setup`);
   return JSON.parse(fs.readFileSync(CONFIG, "utf8")) as Config;
 }
 

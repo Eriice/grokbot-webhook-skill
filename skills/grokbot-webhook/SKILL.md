@@ -13,8 +13,17 @@ Grok Bot 做完后在本机运行 `reply` 命令，把答案写进 `~/.grokbot-w
 脚本：`~/.agents/skills/grokbot-webhook/scripts/grokbot.ts`，用 `node` 运行，需要 Node 22.18+，不依赖任何 npm 包。下面的命令都写全路径，不要放进 shell 变量里调用（zsh 不会拆分变量里的空格）。
 
 ## 先检查
-运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts status`。显示"未设置"说明用户还没完成配置：请用户按安装引导，在自己的终端运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts setup`。
-不要代用户配置，也不要让用户把密钥贴进对话。
+用户直接调用这个 skill 要求配置（例如 `/grokbot-webhook 帮我完成首次配置`）时，直接走下面的首次配置。其他时候先运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts status`。显示"已设置"就直接去发任务；显示"未设置"说明用户还没配置，按下面的首次配置一步一步带用户做完，每步确认成功再进行下一步。
+
+## 首次配置（带用户做，不要代做）
+1. **前提**：用户的电脑上装好并登录了 Grok Bot 桌面版，且连接了 X 账号；`node --version` 在 22.18 以上。不满足就先请用户解决。
+2. **新建 routine**：你运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts instructions`，把输出整段给用户。请用户在 Grok Bot 桌面版里新建一个 routine，
+   触发方式选 Webhook，把这段文字粘贴为指令并保存。
+   成功的标志：routine 页面上能看到 webhook 地址、header 名称和密钥。找不到这个页面时，可以让用户在 Grok Bot 聊天里要这个 routine 的 Webhook URL 链接。
+3. **保存地址和密钥**：请用户在**自己的终端**运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts setup`，依次粘贴地址、header 名称（是 Authorization 就直接回车）和密钥。
+   这一步必须由用户自己做：密钥不能出现在对话里，你也不要替用户输入。完成后你运行 `status` 确认显示"已设置"。
+4. **测试**：你运行 `send --task "只回复一个词：pong"`，再 `wait`。告诉用户 Grok Bot 第一次会请求在本机执行 reply 命令，请用户允许。
+   拿到 pong 就配置完成。401/403 回到第 3 步；超时就请用户看 Grok Bot 里 routine 是否在运行或卡在授权请求上，然后用同一个 RID 再 `wait`，不要重发。
 
 ## 发送任务并等待
 ```bash
