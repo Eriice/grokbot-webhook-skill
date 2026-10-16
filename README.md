@@ -1,11 +1,13 @@
 # grokbot-webhook：让任意 agent 调用 Grok Bot
 
-装好以后，Claude Code、Codex、Cursor、Gemini CLI 等 agent 都可以把查 X、读收藏的任务交给你电脑上的 Grok Bot。
+装好以后，Claude Code、Codex、Cursor、Gemini CLI 等 agent 都可以把查 X 公开推文的任务交给你电脑上的 Grok Bot。
+
+这个 skill 只用于读 X 上的**公开**内容（帖子、讨论串、公开账号、搜索），不读收藏、私信、Following 时间线等需要登录你账号才能看到的数据。
 
 安装是一条命令；之后的一次性配置可以直接在 agent 的会话里让它带你做。
 
 ## 准备
-- 一台 Mac，已装好并登录 **Grok Bot 桌面版**，且已连接你的 X 账号。
+- 一台 Mac，已装好并登录 **Grok Bot 桌面版**（不需要连接你自己的 X 账号）。
 - **Node.js 22.18 或更高版本**。在终端运行 `node --version` 查看；版本太低或没有，就到 https://nodejs.org 下载 LTS 版安装。
 
 ## 第 1 步：安装 skill
@@ -33,7 +35,7 @@ agent 会一步步带你：检查前提条件、在 Grok Bot 里新建 webhook r
 ## 第 3 步：使用
 配置好以后，在任意 agent 里直接用自然语言说：
 - 「让 Grok Bot 搜一下 X 上最近一周关于 Claude Code skills 的讨论」
-- 「让 Grok Bot 读我最新的 100 条收藏，存成 bookmarks.jsonl」
+- 「让 Grok Bot 取 @某账号 最新的 20 条帖子，存成 posts.jsonl」
 
 ## 附：手动配置
 不想让 agent 带着做，也可以自己按下面的步骤操作，效果相同。
@@ -76,5 +78,6 @@ grokbot wait "$RID"
 
 ## 常见问题
 - **电脑要一直开着吗？** 任务执行期间要开着，且 Grok Bot 在运行，否则答案写不回来。
-- **会花钱吗？** Grok Bot 读帖子走你 X 开发者账号的额度，大约每条 $0.005（来自网上的教程，未核实）。大批量前先小批量试。
+- **会花钱吗？** 每次任务都会消耗 Grok Bot 的额度，具体以 Grok Bot 的计费为准。大批量前先小批量试。
+- **能导出我的收藏吗？** 不在这个 skill 的范围内。Grok Bot 没有以你的身份登录 X，读收藏这类私有数据会返回 `ERROR:`。
 - **卸载**：运行 `npx skills remove grokbot-webhook -g`，再删除 `~/.grokbot-webhook`，并在 Grok Bot 里删除这个 routine。
