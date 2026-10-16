@@ -85,6 +85,13 @@ async function setup(): Promise<void> {
   url = url.trim();
   header = header.trim() || "Authorization";
   key = key.trim();
+  // 用户常把整行 "Authorization: Bearer xxx" 粘进 header 名称一栏，拆成名称和值
+  const colon = header.indexOf(":");
+  if (colon > 0) {
+    if (!key) key = header.slice(colon + 1).trim();
+    header = header.slice(0, colon).trim();
+  }
+  if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(header)) fail("header 名称不合法：只填名称本身，例如 Authorization，不要带冒号和后面的内容");
   if (!url || !key) fail("地址和密钥都不能为空");
   if (header.toLowerCase() === "authorization" && !key.toLowerCase().startsWith("bearer ")) key = `Bearer ${key}`;
   fs.writeFileSync(CONFIG, JSON.stringify({ url, header, key } satisfies Config), { mode: 0o600 });
@@ -120,7 +127,9 @@ async function send(task: string, context: string): Promise<void> {
     });
   } catch (e) {
     fs.rmSync(pending, { force: true });
-    fail(`发送失败: ${(e as Error).cause ?? (e as Error).message}`);
+    // 报错信息可能带出 header，打印前把密钥抹掉
+    const msg = String((e as Error).cause ?? (e as Error).message).replaceAll(cfg.key.replace(/^bearer\s+/i, ""), "***");
+    fail(`发送失败: ${msg}`);
   }
   if (!res.ok) {
     fs.rmSync(pending, { force: true });
