@@ -13,7 +13,7 @@ Grok Bot 做完后在本机运行 `reply` 命令，把答案写进 `~/.grokbot-w
 脚本：`~/.agents/skills/grokbot-webhook/scripts/grokbot.ts`，用 `node` 运行，需要 Node 22.18+，不依赖任何 npm 包。下面的命令都写全路径，不要放进 shell 变量里调用（zsh 不会拆分变量里的空格）。
 
 ## 先检查
-运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts status`。显示"已设置"就直接去发任务；显示"未设置"说明用户还没配置，按下面的首次配置一步一步带用户做完，每步确认成功再进行下一步。
+用户直接调用这个 skill 要求配置（例如 `/grokbot-webhook 帮我完成首次配置`）时，直接走下面的首次配置。其他时候先运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts status`。显示"已设置"就直接去发任务；显示"未设置"说明用户还没配置，按下面的首次配置一步一步带用户做完，每步确认成功再进行下一步。
 
 ## 首次配置（带用户做，不要代做）
 1. **前提**：用户的电脑上装好并登录了 Grok Bot 桌面版，且连接了 X 账号；`node --version` 在 22.18 以上。不满足就先请用户解决。
