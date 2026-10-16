@@ -67,35 +67,35 @@ function readHidden(prompt: string): Promise<string> {
   });
 }
 
+// Grok Bot 给的是整行 "Authorization: Bearer xxx"，优先按这种格式解析；只粘了密钥时默认用 Authorization
+function parseAuth(line: string): { header: string; key: string } {
+  const m = /^([!#$%&'*+.^_`|~0-9A-Za-z-]+)\s*:\s*(.+)$/.exec(line);
+  return m ? { header: m[1], key: m[2].trim() } : { header: "Authorization", key: line };
+}
+
 async function setup(): Promise<void> {
   ensureDirs();
   let url: string, header: string, key: string;
   if (process.stdin.isTTY) {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     url = await rl.question("Webhook 地址（在 Grok Bot 的 routine 页面复制）: ");
-    header = await rl.question("Header 名称 [Authorization]: ");
     rl.close();
-    key = await readHidden("密钥（输入时不显示）: ");
+    ({ header, key } = parseAuth((await readHidden("认证信息（粘贴 Grok Bot 给的整行，例如 Authorization: Bearer xxx；输入时不显示）: ")).trim()));
   } else {
-    // 非交互：从标准输入依次读三行（地址、header 名称、密钥）
+    // 非交互：第 1 行地址，第 2 行整行认证信息；兼容旧格式（第 2 行 header 名称，第 3 行密钥）
     const chunks: Buffer[] = [];
     for await (const c of process.stdin) chunks.push(c as Buffer);
-    [url = "", header = "", key = ""] = Buffer.concat(chunks).toString("utf8").split("\n");
+    const [u = "", second = "", third = ""] = Buffer.concat(chunks).toString("utf8").split("\n");
+    url = u;
+    ({ header, key } = third.trim() ? { header: second.trim() || "Authorization", key: third } : parseAuth(second.trim()));
   }
   url = url.trim();
-  header = header.trim() || "Authorization";
   key = key.trim();
-  // 用户常把整行 "Authorization: Bearer xxx" 粘进 header 名称一栏，拆成名称和值
-  const colon = header.indexOf(":");
-  if (colon > 0) {
-    if (!key) key = header.slice(colon + 1).trim();
-    header = header.slice(0, colon).trim();
-  }
-  if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(header)) fail("header 名称不合法：只填名称本身，例如 Authorization，不要带冒号和后面的内容");
+  if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(header)) fail("header 名称不合法，请粘贴 Grok Bot 给的整行，例如 Authorization: Bearer xxx");
   if (!url || !key) fail("地址和密钥都不能为空");
   if (header.toLowerCase() === "authorization" && !key.toLowerCase().startsWith("bearer ")) key = `Bearer ${key}`;
   fs.writeFileSync(CONFIG, JSON.stringify({ url, header, key } satisfies Config), { mode: 0o600 });
-  console.log(`已保存到 ${CONFIG}`);
+  console.log(`已保存到 ${CONFIG}（header: ${header}）`);
 }
 
 function instructions(): void {

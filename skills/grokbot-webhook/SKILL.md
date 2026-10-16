@@ -19,8 +19,8 @@ Grok Bot 做完后在本机运行 `reply` 命令，把答案写进 `~/.grokbot-w
 1. **前提**：用户的电脑上装好并登录了 Grok Bot 桌面版，且连接了 X 账号；`node --version` 在 22.18 以上。不满足就先请用户解决。
 2. **新建 routine**：你运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts instructions`，把输出整段给用户。请用户在 Grok Bot 桌面版里新建一个 routine，
    触发方式选 Webhook，把这段文字粘贴为指令并保存。
-   成功的标志：routine 页面上能看到 webhook 地址、header 名称和密钥。找不到这个页面时，可以让用户在 Grok Bot 聊天里要这个 routine 的 Webhook URL 链接。
-3. **保存地址和密钥**：请用户在**自己的终端**运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts setup`，依次粘贴地址、header 名称（是 Authorization 就直接回车）和密钥。
+   成功的标志：routine 页面上能看到 webhook 地址和认证信息（形如 `Authorization: Bearer xxx`）。找不到这个页面时，可以让用户在 Grok Bot 聊天里要这个 routine 的 Webhook URL 链接。
+3. **保存地址和密钥**：请用户在**自己的终端**运行 `node ~/.agents/skills/grokbot-webhook/scripts/grokbot.ts setup`，先粘贴地址，再粘贴 Grok Bot 给的整行认证信息（形如 `Authorization: Bearer xxx`，只有密钥也可以）。
    这一步必须由用户自己做：密钥不能出现在对话里，你也不要替用户输入。完成后你运行 `status` 确认显示"已设置"。
 4. **测试**：你运行 `send --task "只回复一个词：pong"`，再 `wait`。告诉用户 Grok Bot 第一次会请求在本机执行 reply 命令，请用户允许。
    拿到 pong 就配置完成。401/403 回到第 3 步；超时就请用户看 Grok Bot 里 routine 是否在运行或卡在授权请求上，然后用同一个 RID 再 `wait`，不要重发。

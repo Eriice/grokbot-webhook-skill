@@ -51,14 +51,13 @@ alias grokbot="node $HOME/.agents/skills/grokbot-webhook/scripts/grokbot.ts"
    - 指令（instructions）栏粘贴第 1 小步复制的文字。
 3. 保存。
 
-**确认成功**：routine 页面上能看到 webhook 地址、header 名称和密钥。
+**确认成功**：routine 页面上能看到 webhook 地址和认证信息（形如 `Authorization: Bearer xxx`）。
 如果点开 routine 看不到这个页面，可以在 Grok Bot 聊天里说「给我这个 routine 的 Webhook URL 链接」。
 
 ### ② 把地址和密钥交给脚本
 在终端运行 `grokbot setup`，按提示依次粘贴：
 1. webhook 地址；
-2. header 名称（页面上写的是 Authorization 就直接回车）；
-3. 密钥（输入时屏幕不会显示，粘贴后回车即可）。
+2. 认证信息：直接粘贴 Grok Bot 给的整行，例如 `Authorization: Bearer xxx`（只复制到密钥也可以；输入时屏幕不会显示，粘贴后回车即可）。
 
 **确认成功**：运行 `grokbot status`，显示「配置: 已设置」。
 
